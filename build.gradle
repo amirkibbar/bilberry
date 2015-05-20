@@ -1,0 +1,123 @@
+buildscript {
+    repositories {
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+
+    dependencies {
+        classpath "com.gradle.publish:plugin-publish-plugin:0.9.0"
+    }
+}
+
+plugins {
+    id "com.jfrog.bintray" version "1.2"
+}
+
+group = "ajk.gradle.elastic"
+version = "0.0.1"
+
+String repoName = 'bilberry'
+
+apply plugin: 'groovy'
+apply plugin: 'maven-publish'
+apply plugin: "com.gradle.plugin-publish"
+
+compileGroovy {
+    sourceCompatibility = '1.7'
+    targetCompatibility = '1.7'
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+    compile "de.undercouch:gradle-download-task:1.2"
+    compile "org.apache.httpcomponents:fluent-hc:4.4.1"
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+
+def pomConfig = {
+    licenses {
+        license {
+            name "The Apache Software License, Version 2.0"
+            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+            distribution "repo"
+        }
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('description', 'a gradle plugin for starting and stopping ElasticSearch during integration tests')
+                root.children().last() + pomConfig
+            }
+        }
+    }
+}
+
+task install(dependsOn: 'publishMavenPublicationToMavenLocal') << {
+    logger.info "installing $project.name"
+}
+
+model {
+    tasks.generatePomFileForMavenPublication {
+        destination = file("$buildDir/libs/${project.name}-${project.version}.pom")
+    }
+}
+
+bintray {
+    user = System.getenv("BINTRAY_USER")
+    key = System.getenv("BINTRAY_KEY")
+
+    publications = ['maven']
+
+    publish = true
+
+    pkg {
+        repo = 'maven'
+        name = project.name
+        websiteUrl = "https://github.com/amirkibbar/$repoName"
+        issueTrackerUrl = "https://github.com/amirkibbar/$repoName/issues"
+        vcsUrl = "https://github.com/amirkibbar/${repoName}.git"
+        licenses = ['Apache-2.0']
+        labels = ['gradle', 'plugin', 'elastic', 'ElasticSearch', repoName]
+        version {
+            name = project.version
+        }
+    }
+}
+
+pluginBundle {
+    website = "https://github.com/amirkibbar/$repoName"
+    vcsUrl = "https://github.com/amirkibbar/${repoName}.git"
+    description = 'an ElasticSearch plugin for gradle to help running ElasticSearch during integration test'
+    tags = ['elastic', 'ElasticSearch']
+
+    plugins {
+        greetingsPlugin {
+            id = project.group
+            displayName = 'Gradle ElasticSearch plugin'
+        }
+    }
+
+    mavenCoordinates {
+        groupId = project.group
+        artifactId = project.name
+        version = project.version
+    }
+}
+
+bintrayUpload.dependsOn = [sourcesJar]
+publishPlugins.dependsOn = [bintrayUpload]
