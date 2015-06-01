@@ -30,7 +30,7 @@ class ElasticActions {
         String linuxUrl = "https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-${version}.tar.gz"
         String winUrl = "https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-${version}.zip"
         String elasticPackage = isFamily(FAMILY_WINDOWS) ? winUrl : linuxUrl
-        File elasticFile = new File("$toolsDir/gradle/tools/elastic-${version}.zip")
+        File elasticFile = new File("$toolsDir/elastic-${version}.zip")
 
         DownloadAction elasticDownload = new DownloadAction()
         elasticDownload.dest(elasticFile)

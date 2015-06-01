@@ -4,6 +4,9 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 
+import static ajk.gradle.elastic.ElasticPlugin.CYAN
+import static ajk.gradle.elastic.ElasticPlugin.NORMAL
+import static ajk.gradle.elastic.ElasticPlugin.RED
 import static org.apache.tools.ant.taskdefs.condition.Os.FAMILY_WINDOWS
 import static org.apache.tools.ant.taskdefs.condition.Os.isFamily
 
@@ -55,16 +58,16 @@ class StartElasticAction {
         transportPort = transportPort ?: 9300
         dataDir = dataDir ?: new File("$project.buildDir/elastic")
         logsDir = logsDir ?: new File("$dataDir/logs")
-        println "* elastic: starting ElasticSearch at $elastic.home using http port $httpPort and tcp transport port $transportPort"
-        println "* elastic: ElasticSearch data directory: $dataDir"
-        println "* elastic: ElasticSearch logs directory: $logsDir"
+        println "${CYAN}* elastic:$NORMAL starting ElasticSearch at $elastic.home using http port $httpPort and tcp transport port $transportPort"
+        println "${CYAN}* elastic:$NORMAL ElasticSearch data directory: $dataDir"
+        println "${CYAN}* elastic:$NORMAL ElasticSearch logs directory: $logsDir"
 
         ant.delete(failonerror: true, dir: dataDir)
         ant.delete(failonerror: true, dir: logsDir)
         logsDir.mkdirs()
         dataDir.mkdirs()
 
-        File esScript = new File("$home/bin/elasticsearch${isFamily(FAMILY_WINDOWS) ? '.bat' : ''}")
+        File esScript = new File("${elastic.home}/bin/elasticsearch${isFamily(FAMILY_WINDOWS) ? '.bat' : ''}")
 
         [
                 esScript.absolutePath,
@@ -81,7 +84,7 @@ class StartElasticAction {
                 "ES_MIN_MEM=128m"
         ], elastic.home)
 
-        println "* elastic: waiting for ElasticSearch to start"
+        println "${CYAN}* elastic:$NORMAL waiting for ElasticSearch to start"
         ant.waitfor(maxwait: 2, maxwaitunit: "minute", timeoutproperty: "elasticTimeout") {
             and {
                 socket(server: "localhost", port: transportPort)
@@ -90,10 +93,10 @@ class StartElasticAction {
         }
 
         if (ant.properties['elasticTimeout'] != null) {
-            println "* elastic: could not start ElasticSearch"
+            println "${RED}* elastic:$NORMAL could not start ElasticSearch"
             throw new RuntimeException("failed to start ElasticSearch")
         } else {
-            println "* elastic: ElasticSearch is now up"
+            println "${CYAN}* elastic:$NORMAL ElasticSearch is now up"
         }
     }
 }

@@ -13,7 +13,7 @@ an ElasticSearch gradle plugin for integration tests with ElasticSearch
             maven { url "http://dl.bintray.com/amirk/maven" }
         }
         dependencies {
-            classpath("ajk.gradle.elastic:gradle-elastic-plugin:0.0.1")
+            classpath("ajk.gradle.elastic:gradle-elastic-plugin:0.0.2")
         }
     }
 
@@ -42,13 +42,17 @@ an ElasticSearch gradle plugin for integration tests with ElasticSearch
         }
     
         doLast {
-            stopElastic {}
+            stopElastic {
+                httpPort = 9200
+            }
         }
     }
     
     gradle.taskGraph.afterTask { Task task, TaskState taskState ->
         if (task.name == "integrationTests") {
-            stopElastic {}
+            stopElastic {
+                httpPort = 9200
+            }
         }
     }
 
