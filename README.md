@@ -35,7 +35,7 @@ an ElasticSearch gradle plugin for integration tests with ElasticSearch
             startElastic {
 				elasticVersion = "1.5.2"
                 httpPort = 9200
-				apiPort = 9300
+				transportPort = 9300
 				dataDir = file("$buildDir/elastic")
 				logsDir = file("$buildDir/elastic/logs")
             }
