@@ -5,6 +5,17 @@ an ElasticSearch gradle plugin for integration tests with ElasticSearch
 
 # Using
 
+Plugin setup with gradle >= 2.1:
+
+```gradle
+
+    plugins {
+        id "ajk.gradle.elastic" version "0.0.2"
+    }
+```
+
+Plugin setup with gradle < 2.1:
+
 ```gradle
 
     buildscript {
