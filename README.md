@@ -94,10 +94,12 @@ build clean-up phase.
 Lastly the regular test task is configured to exclude the tests with the IT suffix - we only wanted to run these in the
 integration tests phase, not with the regular tests.
 
-# More configuration
+# More information
 
-When running on windows this plugin installs ElasticSearch if it can't find it in the projectDir/gradle/tools/elastic 
-directory.
+This plugin installs ElasticSearch locally at project.rootDir/gradle/tools/elastic. In addition, the [ElasticSearch 
+head plugin](https://github.com/mobz/elasticsearch-head) is also installed. This plugin provides a nice web-based UI for
+ElasticSearch, which I find useful. To access the UI start ElasticSearch with this plugin, the go to 
+[http://localhost:9200/_plugin/head](http://localhost:9200/_plugin/head).
 
 # References
 
