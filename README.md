@@ -1,6 +1,7 @@
 # gradle-elastic-plugin
 an ElasticSearch gradle plugin for integration tests with ElasticSearch
 
+[ ![Build Status](https://travis-ci.org/amirkibbar/bilberry.svg?branch=master) ](https://travis-ci.org/amirkibbar/bilberry.svg?branch=master)
 [ ![Download](https://api.bintray.com/packages/amirk/maven/gradle-elastic-plugin/images/download.svg) ](https://bintray.com/amirk/maven/gradle-elastic-plugin/_latestVersion)
 
 # Using
