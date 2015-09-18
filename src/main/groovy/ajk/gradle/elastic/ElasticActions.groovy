@@ -32,11 +32,11 @@ class ElasticActions {
         String elasticPackage = isFamily(FAMILY_WINDOWS) ? winUrl : linuxUrl
         File elasticFile = new File("$toolsDir/elastic-${version}.zip")
 
-        DownloadAction elasticDownload = new DownloadAction()
+        DownloadAction elasticDownload = new DownloadAction(project)
         elasticDownload.dest(elasticFile)
         elasticDownload.src(elasticPackage)
         elasticDownload.onlyIfNewer(true)
-        elasticDownload.execute(project)
+        elasticDownload.execute()
 
         ant.delete(dir: home, quiet: true)
         home.mkdirs()
