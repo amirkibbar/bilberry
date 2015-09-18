@@ -25,7 +25,7 @@ Plugin setup with gradle < 2.1:
             maven { url "http://dl.bintray.com/amirk/maven" }
         }
         dependencies {
-            classpath("ajk.gradle.elastic:gradle-elastic-plugin:0.0.2")
+            classpath("ajk.gradle.elastic:gradle-elastic-plugin:0.0.3")
         }
     }
 
