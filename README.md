@@ -11,7 +11,7 @@ Plugin setup with gradle >= 2.1:
 ```gradle
 
     plugins {
-        id "ajk.gradle.elastic" version "0.0.2"
+        id "ajk.gradle.elastic" version "0.0.3"
     }
 ```
 
