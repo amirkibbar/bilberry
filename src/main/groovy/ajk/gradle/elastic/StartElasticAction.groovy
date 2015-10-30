@@ -37,6 +37,10 @@ class StartElasticAction {
     @Optional
     File logsDir
 
+    @Input
+    @Optional
+    List<String> withPlugins = ["head plugin"]
+
     private Project project
 
     private AntBuilder ant
@@ -51,7 +55,7 @@ class StartElasticAction {
         ElasticActions elastic = new ElasticActions(project, toolsDir, elasticVersion ?: DEFAULT_ELASTIC_VERSION)
 
         if (!elastic.installed) {
-            elastic.install()
+            elastic.install(withPlugins)
         }
 
         httpPort = httpPort ?: 9200
