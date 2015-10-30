@@ -49,6 +49,7 @@ class ElasticActions {
             ant.untar(src: elasticFile, dest: "$home", compression: "gzip") {
                 cutdirsmapper(dirs: 1)
             }
+            ant.chmod(file: new File("$home/bin/elasticsearch"), perm: "+x")
         }
 
         if (withPlugins.contains("head plugin")){
