@@ -25,7 +25,7 @@ class ElasticActions {
         return new File("$home/bin/elasticsearch").exists()
     }
 
-    void install() {
+    void install(List<String> withPlugins) {
         println "* elastic: installing elastic version $version"
         String linuxUrl = "https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-${version}.tar.gz"
         String winUrl = "https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-${version}.zip"
@@ -49,23 +49,26 @@ class ElasticActions {
             ant.untar(src: elasticFile, dest: "$home", compression: "gzip") {
                 cutdirsmapper(dirs: 1)
             }
+            ant.chmod(file: new File("$home/bin/elasticsearch"), perm: "+x")
         }
 
-        println "* elastic: installing the head plugin"
-        String plugin = "$home/bin/plugin"
-        if (isFamily(FAMILY_WINDOWS)) {
-            plugin += ".bat"
+        if (withPlugins.contains("head plugin")){
+            println "* elastic: installing the head plugin"
+            String plugin = "$home/bin/plugin"
+            if (isFamily(FAMILY_WINDOWS)) {
+                plugin += ".bat"
+            }
+
+            [
+                    new File(plugin),
+                    "--install",
+                    "mobz/elasticsearch-head"
+            ].execute([
+                    "JAVA_HOME=${System.properties['java.home']}",
+                    "JAVA_OPTS=${System.getenv("JAVA_OPTS")}",
+                    "ES_HOME=$home"
+
+            ], home)
         }
-
-        [
-                new File(plugin),
-                "--install",
-                "mobz/elasticsearch-head"
-        ].execute([
-                "JAVA_HOME=${System.properties['java.home']}",
-                "JAVA_OPTS=${System.getenv("JAVA_OPTS")}",
-                "ES_HOME=$home"
-
-        ], home)
     }
 }

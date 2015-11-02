@@ -13,7 +13,7 @@ plugins {
 }
 
 group = "ajk.gradle.elastic"
-version = "0.0.3"
+version = "0.0.4"
 
 String repoName = 'bilberry'
 
@@ -68,7 +68,7 @@ publishing {
 }
 
 task install(dependsOn: 'publishMavenPublicationToMavenLocal') << {
-    logger.info "installing $project.name"
+    logger.lifecycle "installing $project.name version $version"
 }
 
 model {
