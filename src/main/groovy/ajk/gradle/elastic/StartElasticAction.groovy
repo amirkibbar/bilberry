@@ -4,14 +4,11 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 
-import static ajk.gradle.elastic.ElasticPlugin.CYAN
-import static ajk.gradle.elastic.ElasticPlugin.NORMAL
-import static ajk.gradle.elastic.ElasticPlugin.RED
+import static ajk.gradle.elastic.ElasticPlugin.*
 import static org.apache.tools.ant.taskdefs.condition.Os.FAMILY_WINDOWS
 import static org.apache.tools.ant.taskdefs.condition.Os.isFamily
 
 class StartElasticAction {
-    static final String DEFAULT_ELASTIC_VERSION = "1.5.2"
 
     @Input
     @Optional
@@ -75,6 +72,7 @@ class StartElasticAction {
 
         [
                 esScript.absolutePath,
+                "-p${new File(elastic.home, 'elastic.pid')}",
                 "-Des.http.port=$httpPort",
                 "-Des.transport.tcp.port=$transportPort",
                 "-Des.path.data=$dataDir",
