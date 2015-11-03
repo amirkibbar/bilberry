@@ -51,6 +51,13 @@ class StartElasticAction {
         File toolsDir = toolsDir ?: new File("$project.rootDir/gradle/tools")
         ElasticActions elastic = new ElasticActions(project, toolsDir, elasticVersion ?: DEFAULT_ELASTIC_VERSION)
 
+        def pidFile = new File(elastic.home, 'elastic.pid')
+        if (pidFile.exists()) {
+            println "${YELLOW}* elastic:$NORMAL ElasticSearch seems to be running at pid ${pidFile.text}"
+            println "${YELLOW}* elastic:$NORMAL please check $pidFile"
+            return
+        }
+
         if (!elastic.installed) {
             elastic.install(withPlugins)
         }
@@ -72,7 +79,7 @@ class StartElasticAction {
 
         [
                 esScript.absolutePath,
-                "-p${new File(elastic.home, 'elastic.pid')}",
+                "-p${pidFile}",
                 "-Des.http.port=$httpPort",
                 "-Des.transport.tcp.port=$transportPort",
                 "-Des.path.data=$dataDir",

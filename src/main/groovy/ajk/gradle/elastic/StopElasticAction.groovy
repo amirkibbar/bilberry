@@ -41,7 +41,8 @@ class StopElasticAction {
                 def pidFile = new File(elastic.home, 'elastic.pid')
                 if (!pidFile.exists()) {
                     println "${RED}* elastic:$NORMAL ${pidFile} not found"
-                    throw new RuntimeException("pid file not found")
+                    println "${RED}* elastic:$NORMAL could not stop ElasticSearch, please check manually!"
+                    return
                 }
                 def elasticPid = pidFile.text
                 println "${CYAN}* elastic:$NORMAL going to kill pid $elasticPid"
