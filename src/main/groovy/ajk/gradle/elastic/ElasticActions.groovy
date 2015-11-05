@@ -22,7 +22,22 @@ class ElasticActions {
     }
 
     boolean isInstalled() {
-        return new File("$home/bin/elasticsearch").exists()
+        return new File("$toolsDir/elastic-${version}.zip").exists() && new File("$home/bin/elasticsearch").exists() && isDesiredVersion()
+    }
+
+    boolean isDesiredVersion() {
+        def versionInfo = new StringBuffer()
+
+        File esScript = new File("${home}/bin/elasticsearch${isFamily(FAMILY_WINDOWS) ? '.bat' : ''}")
+
+        [
+            esScript.absolutePath,
+            "--version"
+        ].execute([
+            "JAVA_HOME=${System.properties['java.home']}"
+        ], home).waitForProcessOutput(versionInfo, new StringBuffer())
+
+        return versionInfo.contains(version)
     }
 
     void install(List<String> withPlugins) {
@@ -56,6 +71,7 @@ class ElasticActions {
                 cutdirsmapper(dirs: 1)
             }
             ant.chmod(file: new File("$home/bin/elasticsearch"), perm: "+x")
+            ant.chmod(file: new File("$home/bin/plugin"), perm: "+x")
         }
 
         if (withPlugins.contains("head plugin")) {
