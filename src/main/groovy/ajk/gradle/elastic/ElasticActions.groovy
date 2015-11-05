@@ -71,6 +71,7 @@ class ElasticActions {
                 cutdirsmapper(dirs: 1)
             }
             ant.chmod(file: new File("$home/bin/elasticsearch"), perm: "+x")
+            ant.chmod(file: new File("$home/bin/plugin"), perm: "+x")
         }
 
         if (withPlugins.contains("head plugin")) {
