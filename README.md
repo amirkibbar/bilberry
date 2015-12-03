@@ -11,7 +11,7 @@ Plugin setup with gradle >= 2.1:
 ```gradle
 
     plugins {
-        id "ajk.gradle.elastic" version "0.0.7"
+        id "ajk.gradle.elastic" version "0.0.9"
     }
 ```
 
@@ -25,7 +25,7 @@ Plugin setup with gradle < 2.1:
             maven { url "http://dl.bintray.com/amirk/maven" }
         }
         dependencies {
-            classpath("ajk.gradle.elastic:gradle-elastic-plugin:0.0.7")
+            classpath("ajk.gradle.elastic:gradle-elastic-plugin:0.0.9")
         }
     }
 

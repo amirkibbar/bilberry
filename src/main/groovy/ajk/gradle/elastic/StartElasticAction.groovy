@@ -76,17 +76,22 @@ class StartElasticAction {
         dataDir.mkdirs()
 
         File esScript = new File("${elastic.home}/bin/elasticsearch${isFamily(FAMILY_WINDOWS) ? '.bat' : ''}")
-
-        [
+        def command = [
                 esScript.absolutePath,
-                "-p${pidFile}",
                 "-Des.http.port=$httpPort",
                 "-Des.transport.tcp.port=$transportPort",
                 "-Des.path.data=$dataDir",
                 "-Des.path.logs=$logsDir",
                 "-Des.discovery.zen.ping.multicast.enabled=false"
+        ]
 
-        ].execute([
+        if (!isFamily(FAMILY_WINDOWS)) {
+            command += [
+                    "-p${pidFile}"
+            ]
+        }
+
+        command.execute([
                 "JAVA_HOME=${System.properties['java.home']}",
                 "ES_HOME=$elastic.home",
                 "ES_MAX_MEM=512m",
