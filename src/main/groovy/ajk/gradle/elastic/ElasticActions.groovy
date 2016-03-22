@@ -3,6 +3,8 @@ package ajk.gradle.elastic
 import de.undercouch.gradle.tasks.download.DownloadAction
 import org.gradle.api.Project
 
+import static ajk.gradle.elastic.ElasticPlugin.CYAN
+import static ajk.gradle.elastic.ElasticPlugin.NORMAL
 import static org.apache.tools.ant.taskdefs.condition.Os.FAMILY_WINDOWS
 import static org.apache.tools.ant.taskdefs.condition.Os.isFamily
 
@@ -22,26 +24,57 @@ class ElasticActions {
     }
 
     boolean isInstalled() {
-        return new File("$toolsDir/elastic-${version}.zip").exists() && new File("$home/bin/elasticsearch").exists() && isDesiredVersion()
+        if(!new File("$toolsDir/elastic-${version}.zip").exists()) return false
+
+        if(!new File("$home/bin/elasticsearch").exists()) return false
+
+        boolean desiredVersion = isDesiredVersion()
+
+        if (!desiredVersion) {
+            // this is not the, then we also need to delete the home directory
+            ant.delete(dir: home)
+
+            return false
+        }
+
+        return true
     }
 
     boolean isDesiredVersion() {
         def versionInfo = new StringBuffer()
 
-        File esScript = new File("${home}/bin/elasticsearch${isFamily(FAMILY_WINDOWS) ? '.bat' : ''}")
+        println "${CYAN}* elastic:$NORMAL checking existing version"
+        if (isFamily(FAMILY_WINDOWS)) {
+            File versionScript = new File("${home}/bin/version.bat")
 
-        [
-            esScript.absolutePath,
-            "--version"
-        ].execute([
-            "JAVA_HOME=${System.properties['java.home']}"
-        ], home).waitForProcessOutput(versionInfo, new StringBuffer())
+            if (!versionScript.exists()) {
+                ant.copy(file: "${home}/bin/elasticsearch.bat", tofile: versionScript, filtering: true)
+                ant.replace(file: versionScript, token: "org.elasticsearch.bootstrap.Elasticsearch", value: "org.elasticsearch.Version")
+            }
 
+            println "executing $versionScript"
+            [
+                    versionScript.absolutePath
+            ].execute([
+                    "JAVA_HOME=${System.properties['java.home']}"
+            ], home).waitForProcessOutput(versionInfo, new StringBuffer())
+        } else {
+            File esScript = new File("${home}/bin/elasticsearch${isFamily(FAMILY_WINDOWS) ? '.bat' : ''}")
+
+            [
+                    esScript.absolutePath,
+                    "-v"
+            ].execute([
+                    "JAVA_HOME=${System.properties['java.home']}"
+            ], home).waitForProcessOutput(versionInfo, new StringBuffer())
+        }
+
+        println "${CYAN}* elastic:$NORMAL: reported version: $versionInfo"
         return versionInfo.contains(version)
     }
 
     void install(List<String> withPlugins) {
-        println "* elastic: installing elastic version $version"
+        println "${CYAN}* elastic:$NORMAL installing elastic version $version"
         String linuxUrl = "https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-${version}.tar.gz"
         String winUrl = "https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-${version}.zip"
 
