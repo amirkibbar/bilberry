@@ -13,7 +13,7 @@ plugins {
 }
 
 group = "ajk.gradle.elastic"
-version = "0.0.10"
+version = "0.0.11-SNAPSHOT"
 
 String repoName = 'bilberry'
 
@@ -33,8 +33,8 @@ repositories {
 dependencies {
     compile gradleApi()
     compile localGroovy()
-    compile "de.undercouch:gradle-download-task:2.0.0"
-    compile "org.apache.httpcomponents:fluent-hc:4.4.1"
+    compile "de.undercouch:gradle-download-task:2.1.0"
+    compile "org.apache.httpcomponents:fluent-hc:4.5.2"
 }
 
 task sourcesJar(type: Jar) {
