@@ -44,29 +44,37 @@ class ElasticActions {
         def versionInfo = new StringBuffer()
 
         println "${CYAN}* elastic:$NORMAL checking existing version"
-        if (isFamily(FAMILY_WINDOWS)) {
-            File versionScript = new File("${home}/bin/version.bat")
 
-            if (!versionScript.exists()) {
-                ant.copy(file: "${home}/bin/elasticsearch.bat", tofile: versionScript, filtering: true)
-                ant.replace(file: versionScript, token: "org.elasticsearch.bootstrap.Elasticsearch", value: "org.elasticsearch.Version")
-            }
+        def versionFile = new File("$home/version.txt")
+        if (versionFile.isFile() && versionFile.isReadable()) {
+            versionInfo = versionFile.readLines()
+        }
 
-            println "executing $versionScript"
-            [
-                    versionScript.absolutePath
-            ].execute([
-                    "JAVA_HOME=${System.properties['java.home']}"
-            ], home).waitForProcessOutput(versionInfo, new StringBuffer())
-        } else {
-            File esScript = new File("${home}/bin/elasticsearch${isFamily(FAMILY_WINDOWS) ? '.bat' : ''}")
+        if (!versionInfo) {
+          if (isFamily(FAMILY_WINDOWS)) {
+              File versionScript = new File("${home}/bin/version.bat")
 
-            [
-                    esScript.absolutePath,
-                    "-v"
-            ].execute([
-                    "JAVA_HOME=${System.properties['java.home']}"
-            ], home).waitForProcessOutput(versionInfo, new StringBuffer())
+              if (!versionScript.exists()) {
+                  ant.copy(file: "${home}/bin/elasticsearch.bat", tofile: versionScript, filtering: true)
+                  ant.replace(file: versionScript, token: "org.elasticsearch.bootstrap.Elasticsearch", value: "org.elasticsearch.Version")
+              }
+
+              println "executing $versionScript"
+              [
+                      versionScript.absolutePath
+              ].execute([
+                      "JAVA_HOME=${System.properties['java.home']}"
+              ], home).waitForProcessOutput(versionInfo, new StringBuffer())
+          } else {
+              File esScript = new File("${home}/bin/elasticsearch${isFamily(FAMILY_WINDOWS) ? '.bat' : ''}")
+
+              [
+                      esScript.absolutePath,
+                      "-v"
+              ].execute([
+                      "JAVA_HOME=${System.properties['java.home']}"
+              ], home).waitForProcessOutput(versionInfo, new StringBuffer())
+          }
         }
 
         println "${CYAN}* elastic:$NORMAL: reported version: $versionInfo"
@@ -106,6 +114,8 @@ class ElasticActions {
             ant.chmod(file: new File("$home/bin/elasticsearch"), perm: "+x")
             ant.chmod(file: new File("$home/bin/plugin"), perm: "+x")
         }
+
+        new File("$home/version.txt").write(version)
 
         if (withPlugins.contains("head plugin")) {
             println "* elastic: installing the head plugin"
