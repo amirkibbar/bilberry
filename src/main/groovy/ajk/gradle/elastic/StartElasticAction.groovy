@@ -47,6 +47,8 @@ class StartElasticAction {
         File toolsDir = toolsDir ?: new File("$project.rootDir/gradle/tools")
         ElasticActions elastic = new ElasticActions(project, toolsDir, elasticVersion ?: DEFAULT_ELASTIC_VERSION)
 
+        elastic.install()
+
         def pidFile = new File(elastic.home, 'elastic.pid')
         if (pidFile.exists()) {
             println "${YELLOW}* elastic:$NORMAL ElasticSearch seems to be running at pid ${pidFile.text}"
