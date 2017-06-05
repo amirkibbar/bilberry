@@ -4,7 +4,7 @@ buildscript {
     }
 
     dependencies {
-        classpath "com.gradle.publish:plugin-publish-plugin:0.9.1"
+        classpath "com.gradle.publish:plugin-publish-plugin:0.9.7"
     }
 }
 
@@ -67,8 +67,10 @@ publishing {
     }
 }
 
-task install(dependsOn: 'publishMavenPublicationToMavenLocal') << {
-    logger.lifecycle "installing $project.name version $version"
+task install(dependsOn: 'publishMavenPublicationToMavenLocal') {
+    doLast {
+        logger.lifecycle "installing $project.name version $version"
+    }
 }
 
 model {
@@ -117,6 +119,10 @@ pluginBundle {
         artifactId = project.name
         version = project.version
     }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = 3.5
 }
 
 bintrayUpload.dependsOn = [sourcesJar]
