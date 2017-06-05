@@ -69,7 +69,7 @@ class StartElasticAction {
         logsDir.mkdirs()
         dataDir.mkdirs()
 
-        def optPrefix = elasticVersion.startsWith("5") ? "-E" : "-Des."
+        def optPrefix = elastic.version.startsWith("5") ? "-E" : "-Des."
         File esScript = new File("${elastic.home}/bin/elasticsearch${isFamily(FAMILY_WINDOWS) ? '.bat' : ''}")
         def command = [
                 esScript.absolutePath,
@@ -85,12 +85,23 @@ class StartElasticAction {
             ]
         }
 
-        Process p = command.execute([
-                "JAVA_HOME=${System.properties['java.home']}",
-                "ES_HOME=$elastic.home",
+        def esEnv = [
+            "JAVA_HOME=${System.properties['java.home']}",
+            "ES_HOME=$elastic.home"
+        ]
+
+        if(elastic.version.startsWith("5")) {
+            esEnv += [
+                "ES_JAVA_OPTS=-Xms128m -Xmx512m"
+            ]
+        } else {
+            esEnv += [
                 "ES_MAX_MEM=512m",
                 "ES_MIN_MEM=128m"
-        ], elastic.home)
+            ]
+        }
+
+        Process p = command.execute(esEnv, elastic.home)
 
         def out = new StringBuilder()
         p.consumeProcessOutput(out, out)
