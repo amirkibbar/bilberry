@@ -4,7 +4,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 
 class ElasticPlugin implements Plugin<Project> {
-    static final String DEFAULT_ELASTIC_VERSION = "1.5.2"
+    static final String DEFAULT_ELASTIC_VERSION = "5.1.2"
 
     static final String ESC = "${(char) 27}"
     static final String CYAN = "${ESC}[36m"

@@ -34,10 +34,6 @@ class StartElasticAction {
     @Optional
     File logsDir
 
-    @Input
-    @Optional
-    List<String> withPlugins = ["head plugin"]
-
     private Project project
 
     private AntBuilder ant
@@ -58,10 +54,6 @@ class StartElasticAction {
             return
         }
 
-        if (!elastic.installed) {
-            elastic.install(withPlugins)
-        }
-
         httpPort = httpPort ?: 9200
         transportPort = transportPort ?: 9300
         dataDir = dataDir ?: new File("$project.buildDir/elastic")
@@ -75,14 +67,14 @@ class StartElasticAction {
         logsDir.mkdirs()
         dataDir.mkdirs()
 
+        def optPrefix = elasticVersion.startsWith("5") ? "-E" : "-Des."
         File esScript = new File("${elastic.home}/bin/elasticsearch${isFamily(FAMILY_WINDOWS) ? '.bat' : ''}")
         def command = [
                 esScript.absolutePath,
-                "-Des.http.port=$httpPort",
-                "-Des.transport.tcp.port=$transportPort",
-                "-Des.path.data=$dataDir",
-                "-Des.path.logs=$logsDir",
-                "-Des.discovery.zen.ping.multicast.enabled=false"
+                "${optPrefix}http.port=$httpPort",
+                "${optPrefix}transport.tcp.port=$transportPort",
+                "${optPrefix}path.data=$dataDir",
+                "${optPrefix}path.logs=$logsDir"
         ]
 
         if (!isFamily(FAMILY_WINDOWS)) {

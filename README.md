@@ -37,40 +37,40 @@ Plugin setup with gradle < 2.1:
 ```gradle
 
     task integrationTests(type: Test) {
-        reports {
-            html.destination "$buildDir/reports/integration-tests"
-        }
+      reports {
+          html.destination "$buildDir/reports/integration-tests"
+      }
 
-        include "**/*IT.*"
+      include "**/*IT.*"
 
-        doFirst {
-            startElastic {
-				elasticVersion = "1.5.2"
-                httpPort = 9200
-				transportPort = 9300
-				dataDir = file("$buildDir/elastic")
-				logsDir = file("$buildDir/elastic/logs")
-            }
+      doFirst {
+        startElastic {
+          elasticVersion = "5.1.2"
+          httpPort = 9200
+          transportPort = 9300
+          dataDir = file("$buildDir/elastic")
+          logsDir = file("$buildDir/elastic/logs")
         }
-    
-        doLast {
-            stopElastic {
-                httpPort = 9200
-            }
+      }
+  
+      doLast {
+        stopElastic {
+          httpPort = 9200
         }
+      }
     }
     
     gradle.taskGraph.afterTask { Task task, TaskState taskState ->
-        if (task.name == "integrationTests") {
-            stopElastic {
-                httpPort = 9200
-            }
+      if (task.name == "integrationTests") {
+        stopElastic {
+          httpPort = 9200
         }
+      }
     }
 
     test {
-        include '**/*Test.*'
-        exclude '**/*IT.*'
+      include '**/*Test.*'
+      exclude '**/*IT.*'
     }
 ```
 
@@ -84,7 +84,7 @@ work for you they can be ommitted:
 ```gradle
 
     doFirst {
-        startElastic {}
+      startElastic {}
     }
 ```
 
@@ -94,13 +94,6 @@ build clean-up phase.
 
 Lastly the regular test task is configured to exclude the tests with the IT suffix - we only wanted to run these in the
 integration tests phase, not with the regular tests.
-
-# More information
-
-This plugin installs ElasticSearch locally at project.rootDir/gradle/tools/elastic. In addition, the [ElasticSearch 
-head plugin](https://github.com/mobz/elasticsearch-head) is also installed. This plugin provides a nice web-based UI for
-ElasticSearch, which I find useful. To access the UI start ElasticSearch with this plugin, the go to 
-[http://localhost:9200/_plugin/head](http://localhost:9200/_plugin/head).
 
 # References
 
