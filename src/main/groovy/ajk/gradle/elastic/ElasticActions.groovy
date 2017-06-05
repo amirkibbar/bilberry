@@ -24,14 +24,12 @@ class ElasticActions {
   }
 
   boolean isInstalled() {
-    if (!new File("$toolsDir/elastic-${version}.zip").exists()) return false
-
     if (!new File("$home/bin/elasticsearch").exists()) return false
 
     boolean desiredVersion = isDesiredVersion()
 
     if (!desiredVersion) {
-      // this is not the, then we also need to delete the home directory
+      // this is not the desired version, then we also need to delete the home directory
       ant.delete(dir: home)
 
       return false
@@ -41,36 +39,16 @@ class ElasticActions {
   }
 
   boolean isDesiredVersion() {
-    def versionInfo = new StringBuffer()
-
     println "${CYAN}* elastic:$NORMAL checking existing version"
-    if (isFamily(FAMILY_WINDOWS)) {
-      File versionScript = new File("${home}/bin/version.bat")
 
-      if (!versionScript.exists()) {
-        ant.copy(file: "${home}/bin/elasticsearch.bat", tofile: versionScript, filtering: true)
-        ant.replace(file: versionScript, token: "org.elasticsearch.bootstrap.Elasticsearch", value: "org.elasticsearch.Version")
-      }
+    def versionFile = new File("$home/version.txt")
+    if(!versionFile.exists()) return false
 
-      println "executing $versionScript"
-      [
-          versionScript.absolutePath
-      ].execute([
-          "JAVA_HOME=${System.properties['java.home']}"
-      ], home).waitForProcessOutput(versionInfo, new StringBuffer())
-    } else {
-      File esScript = new File("${home}/bin/elasticsearch${isFamily(FAMILY_WINDOWS) ? '.bat' : ''}")
+    def detectedVersion = versionFile.text
 
-      [
-          esScript.absolutePath,
-          "-v"
-      ].execute([
-          "JAVA_HOME=${System.properties['java.home']}"
-      ], home).waitForProcessOutput(versionInfo, new StringBuffer())
-    }
+    println "${CYAN}* elastic:$NORMAL: detected version: $detectedVersion"
 
-    println "${CYAN}* elastic:$NORMAL: reported version: $versionInfo"
-    return versionInfo.contains(version)
+    return detectedVersion.contains(version)
   }
 
   void install() {
@@ -115,5 +93,7 @@ class ElasticActions {
       ant.chmod(file: new File("$home/bin/elasticsearch"), perm: "+x")
       ant.chmod(file: new File("$home/bin/plugin"), perm: "+x")
     }
+
+    new File("$home/version.txt") << "$version"
   }
 }
