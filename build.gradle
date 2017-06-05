@@ -13,7 +13,7 @@ plugins {
 }
 
 group = "ajk.gradle.elastic"
-version = "0.0.13"
+version = "0.0.14"
 
 String repoName = 'bilberry'
 

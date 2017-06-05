@@ -83,12 +83,15 @@ class StartElasticAction {
             ]
         }
 
-        command.execute([
+        Process p = command.execute([
                 "JAVA_HOME=${System.properties['java.home']}",
                 "ES_HOME=$elastic.home",
                 "ES_MAX_MEM=512m",
                 "ES_MIN_MEM=128m"
         ], elastic.home)
+
+        def out = new StringBuilder()
+        p.consumeProcessOutput(out, out)
 
         println "${CYAN}* elastic:$NORMAL waiting for ElasticSearch to start"
         ant.waitfor(maxwait: 2, maxwaitunit: "minute", timeoutproperty: "elasticTimeout") {
@@ -97,6 +100,8 @@ class StartElasticAction {
                 ant.http(url: "http://localhost:$httpPort")
             }
         }
+
+        println out
 
         if (ant.properties['elasticTimeout'] != null) {
             println "${RED}* elastic:$NORMAL could not start ElasticSearch"
