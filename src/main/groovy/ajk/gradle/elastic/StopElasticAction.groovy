@@ -55,7 +55,7 @@ class StopElasticAction {
             println "${CYAN}* elastic:$NORMAL waiting for ElasticSearch to shutdown"
             ant.waitfor(maxwait: 2, maxwaitunit: "minute", timeoutproperty: "elasticTimeout") {
                 not {
-                    ant.http(url: "http://localhost:$httpPort")
+                    ant.http(url: "http://localhost:${httpPort ?: 9200}")
                 }
             }
 
