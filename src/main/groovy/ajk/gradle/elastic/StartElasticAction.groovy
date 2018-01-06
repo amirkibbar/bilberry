@@ -69,7 +69,7 @@ class StartElasticAction {
         logsDir.mkdirs()
         dataDir.mkdirs()
 
-        def optPrefix = elastic.version.startsWith("5") ? "-E" : "-Des."
+        def optPrefix = Integer.valueOf( elastic.version.split( "\\." )[0]) >= 5 ? "-E" : "-Des."
         File esScript = new File("${elastic.home}/bin/elasticsearch${isFamily(FAMILY_WINDOWS) ? '.bat' : ''}")
         def command = [
                 esScript.absolutePath,
@@ -90,7 +90,7 @@ class StartElasticAction {
             "ES_HOME=$elastic.home"
         ]
 
-        if(elastic.version.startsWith("5")) {
+        if (Integer.valueOf( elastic.version.split( "\\." )[0]) >= 5) {
             esEnv += [
                 "ES_JAVA_OPTS=-Xms128m -Xmx512m"
             ]

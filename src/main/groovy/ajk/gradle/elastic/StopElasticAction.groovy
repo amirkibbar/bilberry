@@ -37,7 +37,7 @@ class StopElasticAction {
         println "${CYAN}* elastic:$NORMAL stopping ElasticSearch"
 
         try {
-            if (elastic.version.startsWith("2") || elastic.version.startsWith("5")) {
+            if (Integer.valueOf( elastic.version.split( "\\." )[0]) >= 2) {
                 def pidFile = new File(elastic.home, 'elastic.pid')
                 if (!pidFile.exists()) {
                     println "${RED}* elastic:$NORMAL ${pidFile} not found"
