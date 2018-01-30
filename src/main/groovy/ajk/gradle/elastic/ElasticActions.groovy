@@ -59,15 +59,29 @@ class ElasticActions {
 
     println "${CYAN}* elastic:$NORMAL installing elastic version $version"
 
-    String linuxUrl = "https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-${version}.tar.gz"
-    String winUrl = "https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-${version}.zip"
+    def majorVersion = Integer.valueOf( version.split( "\\." )[0] )
 
-    if (version.startsWith("5")) {
-      linuxUrl = "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${version}.tar.gz"
-      winUrl = "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${version}.zip"
-    } else if (version.startsWith("2")) {
-      linuxUrl = "https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/${version}/elasticsearch-${version}.tar.gz"
-      winUrl = "https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/zip/elasticsearch/${version}/elasticsearch-${version}.zip"
+    String linuxUrl
+    String winUrl
+
+    switch (majorVersion) {
+      case  0:
+      case  1:
+        linuxUrl = "https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-${version}.tar.gz"
+        winUrl = "https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-${version}.zip"
+        break
+
+      case  2:
+        linuxUrl = "https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/${version}/elasticsearch-${version}.tar.gz"
+        winUrl = "https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/zip/elasticsearch/${version}/elasticsearch-${version}.zip"
+        break
+
+      // there are no versions 3 and 4
+
+      default: // catches version 5 and up
+        linuxUrl = "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${version}.tar.gz"
+        winUrl = "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${version}.zip"
+        break
     }
 
     String elasticPackage = isFamily(FAMILY_WINDOWS) ? winUrl : linuxUrl
