@@ -95,6 +95,21 @@ build clean-up phase.
 Lastly the regular test task is configured to exclude the tests with the IT suffix - we only wanted to run these in the
 integration tests phase, not with the regular tests.
 
+# Custom Binary URLs
+
+By default the binary zip distribution is downloaded from elastic.co, but this can be amended to point at another
+distribution zip using the `url` config in startElastic:
+
+```gradle
+startElastic {
+   // for example the integ-test-zips hosted on maven central or your own proxy / mirror repo
+   url 'http://central.maven.org/maven2/org/elasticsearch/distribution/integ-test-zip/elasticsearch/5.6.10/elasticsearch-5.6.10.zip'
+
+   // Note you still need the version defined, but this could be made a gradle project property to DRY
+   version '5.6.10'
+}
+```
+
 # References
 
 - [ElasticSearch](https://www.elastic.co/products/elasticsearch)

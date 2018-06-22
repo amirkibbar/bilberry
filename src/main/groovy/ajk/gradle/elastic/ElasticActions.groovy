@@ -9,16 +9,18 @@ import static org.apache.tools.ant.taskdefs.condition.Os.FAMILY_WINDOWS
 import static org.apache.tools.ant.taskdefs.condition.Os.isFamily
 
 class ElasticActions {
+  String url
   String version
   File toolsDir
   Project project
   AntBuilder ant
   File home
 
-  ElasticActions(Project project, File toolsDir, String version) {
+  ElasticActions(Project project, File toolsDir, String version, String url) {
     this.project = project
     this.toolsDir = toolsDir
     this.version = version
+    this.url = url
     this.ant = project.ant
     home = new File("$toolsDir/elastic")
   }
@@ -48,66 +50,77 @@ class ElasticActions {
 
     println "${CYAN}* elastic:$NORMAL: detected version: $detectedVersion"
 
-    return detectedVersion.contains(version)
+    return detectedVersion.equals(version)
   }
 
   void install() {
-    if(isInstalled()) {
+    if (isInstalled()) {
       println "${CYAN}* elastic:$NORMAL elastic search version $version detected at $home"
       return
     }
 
     println "${CYAN}* elastic:$NORMAL installing elastic version $version"
 
+    if (this.url) {
+      installFromUrl()
+    } else {
+      installFromElastic()
+    }
+
+    doExtract()
+  }
+
+  void installFromUrl() {
+    doDownload(this.url)
+  }
+
+  void installFromElastic() {
     def majorVersion = Integer.valueOf( version.split( "\\." )[0] )
 
-    String linuxUrl
-    String winUrl
+    String url
 
+    // NOTE: there is no difference between the tar and zip distros
     switch (majorVersion) {
       case  0:
       case  1:
-        linuxUrl = "https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-${version}.tar.gz"
-        winUrl = "https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-${version}.zip"
+        url = "https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-${version}.zip"
         break
 
       case  2:
-        linuxUrl = "https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/${version}/elasticsearch-${version}.tar.gz"
-        winUrl = "https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/zip/elasticsearch/${version}/elasticsearch-${version}.zip"
+        url = "https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/zip/elasticsearch/${version}/elasticsearch-${version}.zip"
         break
 
       // there are no versions 3 and 4
 
       default: // catches version 5 and up
-        linuxUrl = "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${version}.tar.gz"
-        winUrl = "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${version}.zip"
+        url = "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${version}.zip"
         break
     }
 
-    String elasticPackage = isFamily(FAMILY_WINDOWS) ? winUrl : linuxUrl
+    doDownload(url)
+  }
+
+  void doDownload(binaryUrl) {
     File elasticFile = new File("$toolsDir/elastic-${version}.zip")
 
     DownloadAction elasticDownload = new DownloadAction(project)
     elasticDownload.dest(elasticFile)
-    elasticDownload.src(elasticPackage)
+    elasticDownload.src(binaryUrl)
     elasticDownload.onlyIfNewer(true)
     elasticDownload.execute()
+  }
 
+  void doExtract() {
     ant.delete(dir: home, quiet: true)
     home.mkdirs()
 
-    if (isFamily(FAMILY_WINDOWS)) {
-      ant.unzip(src: elasticFile, dest: "$home") {
-        cutdirsmapper(dirs: 1)
-      }
-    } else {
-      ant.untar(src: elasticFile, dest: "$home", compression: "gzip") {
-        cutdirsmapper(dirs: 1)
-      }
-      ant.chmod(file: new File("$home/bin/elasticsearch"), perm: "+x")
-      ant.chmod(file: new File("$home/bin/plugin"), perm: "+x")
+    ant.unzip(src: "$toolsDir/elastic-${version}.zip", dest: "$home") {
+      cutdirsmapper(dirs: 1)
     }
 
-    new File("$home/version.txt") << "$version"
+    ant.chmod(file: new File("$home/bin/elasticsearch"), perm: "+x")
+    ant.chmod(file: new File("$home/bin/plugin"), perm: "+x")
+
+    new File("$home/version.txt").text = version
   }
 }
