@@ -32,7 +32,7 @@ class StopElasticAction {
 
     void execute() {
         File toolsDir = toolsDir ?: new File("$project.rootDir/gradle/tools")
-        ElasticActions elastic = new ElasticActions(project, toolsDir, elasticVersion ?: DEFAULT_ELASTIC_VERSION)
+        ElasticActions elastic = new ElasticActions(project, toolsDir, elasticVersion ?: DEFAULT_ELASTIC_VERSION, null)
 
         println "${CYAN}* elastic:$NORMAL stopping ElasticSearch"
 
