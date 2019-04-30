@@ -106,6 +106,9 @@ class ElasticActions {
       }
       ant.chmod(file: new File("$home/bin/elasticsearch"), perm: "+x")
       ant.chmod(file: new File("$home/bin/plugin"), perm: "+x")
+      // controller is used to start the elastic server
+      ant.chmod(file: new File("$home/modules/x-pack-ml/platform/linux-x86_64/bin/controller"), perm: "+x")
+      ant.chmod(file: new File("$home/modules/x-pack-ml/platform/darwin-x86_64/bin/controller"), perm: "+x")
     }
 
     new File("$home/version.txt") << "$version"
